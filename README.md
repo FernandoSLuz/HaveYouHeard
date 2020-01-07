@@ -1,4 +1,4 @@
-# Python websockets sample for Google App Engine Flexible Environment
+# Python websockets start config for HaveYouHeard Game
 
 This sample demonstrates how to use websockets on [Google App Engine Flexible Environment](https://cloud.google.com/appengine).
 
