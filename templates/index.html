@@ -30,7 +30,11 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('my_response', function(msg, cb) {
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data).html());
+                username = "Unknown";
+                if(msg.username){
+                   username = msg.username; 
+                }
+                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ' User - ' + username + ' : ' + msg.data).html());
                 if (cb)
                     cb();
             });
@@ -62,27 +66,27 @@
             // These accept data from the user and send it to the server in a
             // variety of ways
             $('form#emit').submit(function(event) {
-                socket.emit('my_event', {data: $('#emit_data').val()});
+                socket.emit('my_event', {data: $('#emit_data').val(), username: $('#username').val()});
                 return false;
             });
             $('form#broadcast').submit(function(event) {
-                socket.emit('my_broadcast_event', {'data': $('#broadcast_data').val()});
+                socket.emit('my_broadcast_event', {'data': $('#broadcast_data').val(), username: $('#username').val()});
                 return false;
             });
             $('form#join').submit(function(event) {
-                socket.emit('join', {room: $('#join_room').val()});
+                socket.emit('join', {room: $('#join_room').val(), username: $('#username').val()});
                 return false;
             });
             $('form#leave').submit(function(event) {
-                socket.emit('leave', {room: $('#leave_room').val()});
+                socket.emit('leave', {room: $('#leave_room').val(), username: $('#username').val()});
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('my_room_event', {room: $('#room_name').val(), data: $('#room_data').val()});
+                socket.emit('my_room_event', {room: $('#room_name').val(), data: $('#room_data').val(), username: $('#username').val()});
                 return false;
             });
             $('form#close').submit(function(event) {
-                socket.emit('close_room', {room: $('#close_room').val()});
+                socket.emit('close_room', {room: $('#close_room').val(), username: $('#username').val()});
                 return false;
             });
             $('form#disconnect').submit(function(event) {
@@ -97,6 +101,9 @@
     <p>Async mode is: <b>{{ async_mode }}</b></p>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Send:</h2>
+    <form>
+        <input type="text" name="username" id="username" placeholder="Username">
+    </form>
     <form id="emit" method="POST" action='#'>
         <input type="text" name="emit_data" id="emit_data" placeholder="Message">
         <input type="submit" value="Echo">
