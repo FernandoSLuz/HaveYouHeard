@@ -33,7 +33,7 @@ def index():
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
-@socketio.on('my_event', namespace='/test')
+@socketio.on('my_event', namespace='/haveYouHeard')
 def test_message(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -42,7 +42,7 @@ def test_message(message):
          {'data': message['data'], 'count': session['receive_count']})
 
 
-@socketio.on('my_broadcast_event', namespace='/test')
+@socketio.on('my_broadcast_event', namespace='/haveYouHeard')
 def test_broadcast_message(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -54,7 +54,7 @@ def test_broadcast_message(message):
          broadcast=True)
 
 
-@socketio.on('join', namespace='/test')
+@socketio.on('join', namespace='/haveYouHeard')
 def join(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -62,10 +62,10 @@ def join(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': 'In rooms: ' + ', '.join(rooms()),
-          'count': session['receive_count']})
+          'count': session['receive_count'], 'rooms': len(rooms)})
 
 
-@socketio.on('leave', namespace='/test')
+@socketio.on('leave', namespace='/haveYouHeard')
 def leave(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -76,7 +76,7 @@ def leave(message):
           'count': session['receive_count']})
 
 
-@socketio.on('close_room', namespace='/test')
+@socketio.on('close_room', namespace='/haveYouHeard')
 def close(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -87,7 +87,7 @@ def close(message):
     close_room(message['room'])
 
 
-@socketio.on('my_room_event', namespace='/test')
+@socketio.on('my_room_event', namespace='/haveYouHeard')
 def send_room_message(message):
     if(isinstance(message, str)):
         message = json.loads(message)
@@ -97,7 +97,7 @@ def send_room_message(message):
          room=message['room'])
 
 
-@socketio.on('disconnect_request', namespace='/test')
+@socketio.on('disconnect_request', namespace='/haveYouHeard')
 def disconnect_request():
     @copy_current_request_context
     def can_disconnect():
@@ -112,12 +112,12 @@ def disconnect_request():
          callback=can_disconnect)
 
 
-@socketio.on('my_ping', namespace='/test')
+@socketio.on('my_ping', namespace='/haveYouHeard')
 def ping_pong():
     emit('my_pong')
 
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect', namespace='/haveYouHeard')
 def test_connect():
     global thread
     with thread_lock:
@@ -126,7 +126,7 @@ def test_connect():
     emit('my_response', {'data': 'Connected', 'count': 0})
 
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect', namespace='/haveYouHeard')
 def test_disconnect():
     print('Client disconnected', request.sid)
 
