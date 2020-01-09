@@ -65,7 +65,7 @@ def background_thread():
 def main():
     return 'teste'
 
-@app.route('/teste')
+@app.route('/app')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
 
