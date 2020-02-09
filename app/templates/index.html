@@ -11,30 +11,30 @@
             // Socket.IO will multiplex all those connections on a single
             // physical channel. If you don't care about multiple channels, you
             // can set the namespace to an empty string.
-            namespace = '/haveYouHeard';
 
             // Connect to the Socket.IO server.
             // The connection URL has the following format, relative to the current page:
             //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io(namespace);
+            var socket = io();
 
             // Event handler for new connections.
             // The callback function is invoked when a connection with the
             // server is established.
             socket.on('connect', function() {
-                socket.emit('my_event', {data: 'I\'m connected!'});
+                socket.emit('user_event', {action: 'greetings', data: 'I\'m connected!'});
             });
 
             // Event handler for server sent data.
             // The callback function is invoked whenever the server emits data
             // to the client. The data is then displayed in the "Received"
             // section of the page.
-            socket.on('my_response', function(msg, cb) {
-                username = "Unknown";
-                if(msg.username){
-                   username = msg.username; 
-                }
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ' User - ' + username + ' : ' + msg.data).html());
+            socket.on('user_response', function(msg, cb) {
+                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ' Action - ' + msg.action + ' : ' + msg.data).html());
+                if (cb)
+                    cb();
+            });
+            socket.on('global_response', function(msg, cb) {
+                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ' Action - ' + msg.action + ' : ' + msg.data).html());
                 if (cb)
                     cb();
             });
@@ -66,19 +66,19 @@
             // These accept data from the user and send it to the server in a
             // variety of ways
             $('form#emit').submit(function(event) {
-                socket.emit('my_event', {data: $('#emit_data').val(), username: $('#username').val()});
+                socket.emit('user_event', {data: $('#emit_data').val(), action: $('#action').val()});
                 return false;
             });
             $('form#broadcast').submit(function(event) {
-                socket.emit('my_broadcast_event', {'data': $('#broadcast_data').val(), username: $('#username').val()});
+                socket.emit('global_event', {data: $('#broadcast_data').val(), action: $('#action').val()});
                 return false;
             });
             $('form#join').submit(function(event) {
-                socket.emit('join', {room: $('#join_room').val(), username: $('#username').val()});
+                socket.emit('join', {room: $('#join_room').val(), action: $('#action').val()});
                 return false;
             });
             $('form#leave').submit(function(event) {
-                socket.emit('leave', {room: $('#leave_room').val(), username: $('#username').val()});
+                socket.emit('leave', {room: $('#leave_room').val(), action: $('#action').val()});
                 return false;
             });
             $('form#send_room').submit(function(event) {
@@ -102,7 +102,7 @@
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Send:</h2>
     <form>
-        <input type="text" name="username" id="username" placeholder="Username">
+        <input type="text" name="action" id="action" placeholder="action">
     </form>
     <form id="emit" method="POST" action='#'>
         <input type="text" name="emit_data" id="emit_data" placeholder="Message">

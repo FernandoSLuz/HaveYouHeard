@@ -2,39 +2,38 @@ from .. import socketio
 from flask_socketio import emit
 import json
 from flask import session
+from . import events_tools
 
-@socketio.on('my_event', namespace='/haveYouHeard')
-def test_message(message):
-    if(isinstance(message, str)):
-        message = json.loads(message)
-    username = "unknown"
-    if 'username' in message:
-        username = message['username']
+@socketio.on('user_event')
+def user_event(form):
+    if(isinstance(form, str)):
+        form = json.loads(form)
+    print('sending message')
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response', {'data': message['data'], 'count': session['receive_count'], 'username': username})
+    emit('user_response',
+    {'action': form['action'],
+    'count': session['receive_count'],
+    'data': form['data']
+    })
 
-
-@socketio.on('my_broadcast_event', namespace='/haveYouHeard')
-def test_broadcast_message(message):
-    if(isinstance(message, str)):
-        message = json.loads(message)
-    username = "unknown"
-    if 'username' in message:
-        username = message['username']
+@socketio.on('global_event')
+def global_event(form):
+    if(isinstance(form, str)):
+        form = json.loads(form)
     session['receive_count'] = session.get('receive_count', 0) + 1
-    print(type(message))
-    print({'data': message['data']})
-    emit('my_response', {'data': message['data'], 'count': session['receive_count'], 'username': username},
-         broadcast=True)
+    emit('global_response',
+    {'action': form['action'],
+    'count': session['receive_count'],
+    'data': form['data']},
+    broadcast=True)
 
-
-@socketio.on('my_room_event', namespace='/haveYouHeard')
+@socketio.on('match_event')
 def send_room_message(message):
-    if(isinstance(message, str)):
-        message = json.loads(message)
-    username = "unknown"
-    if 'username' in message:
-        username = message['username']
+    if(isinstance(form, str)):
+        form = json.loads(form)
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response', {'data': message['data'], 'count': session['receive_count'], 'username': username},
-         room=message['room'])
+    emit('global_response',
+    {'action': form['action'],
+    'count': session['receive_count'],
+    'data': form['data']},
+    room=form['match_data']['id'])
