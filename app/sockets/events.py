@@ -28,11 +28,12 @@ def global_event(form):
     broadcast=True)
 
 @socketio.on('match_event')
-def send_room_message(message):
+def match_event(form):
     if(isinstance(form, str)):
-        form = json.loads(form)
+        form = json.loads(form, encoding='utf-8')
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('global_response',
+    print(form)
+    emit('match_response',
     {'action': form['action'],
     'count': session['receive_count'],
     'data': form['data']},

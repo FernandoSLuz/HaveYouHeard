@@ -4,9 +4,8 @@ from flask_socketio import join_room, join_room, leave_room, close_room, rooms, 
 from flask import session
 from . import events_tools
 
-@socketio.on('join', namespace='/haveYouHeard')
+@socketio.on('join')
 def join(form):
-    print("JOINING ----------------------------")
     if(isinstance(form, str)):
         form = json.loads(form)
     join_room(form['match_data']['id'])
@@ -14,15 +13,15 @@ def join(form):
     data = {
         'user_data': form['user_data'],
         'match_data': form['match_data'],
-        'match_user_data': form['match_user_data']
+        'match_users_data': form['match_users_data']
     }
     emit('match_response',
-         {'action': 'user_joined ' + ', '.join(rooms()),
+         {'action': 'join_match',
           'count': session['receive_count'],
           'data': data
     })
 
-@socketio.on('leave', namespace='/haveYouHeard')
+@socketio.on('leave')
 def leave(form):
     if(isinstance(form, str)):
         form = json.loads(form)
@@ -34,7 +33,7 @@ def leave(form):
           'data': form['user_data']
     })
 
-@socketio.on('close_room', namespace='/haveYouHeard')
+@socketio.on('close_room')
 def close(form):
     if(isinstance(form, str)):
         form = json.loads(form)
