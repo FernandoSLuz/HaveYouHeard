@@ -8,12 +8,10 @@ from . import events_tools
 def join(form):
     if(isinstance(form, str)):
         form = json.loads(form)
-    print("joining")
     join_room(form['match_data']['id'])
     session['receive_count'] = session.get('receive_count', 0) + 1
     events_tools.user_joined(form)
     data = events_tools.get_match_info(form['match_data']['id'])
-    print(data)
     emit('match_response',
          {'action': 'join_match',
           'count': session['receive_count'],

@@ -5,6 +5,12 @@ users = []
 match_users = []
 
 
+def reset_data():
+    matches.clear()
+    users.clear()
+    match_users.clear()
+
+
 def populate_match(new_match):
     for match in matches:
         if(match['id'] == new_match['id']):
@@ -23,6 +29,8 @@ def populate_match_users(new_match_users):
 
 def user_joined(form):
     populate_match(form['match_data'])
+    print(form['match_data'])
+    print(matches)
     users.append(form['user_data'])
     populate_match_users(form['match_users_data'])
 
