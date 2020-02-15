@@ -6,5 +6,4 @@ connect_database()
 app = create_app(debug=True)
 
 if __name__ == '__main__':
-    print("test")
     socketio.run(app, debug=True)
