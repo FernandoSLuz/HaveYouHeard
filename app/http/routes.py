@@ -78,7 +78,6 @@ def create_match():
         verification = routes_tools.check_db_callback(callbackDict, 'match created', 'match not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    sockets.events_tools.reset_data()
     return json.dumps(callbackDict, indent=2, default=str), status_code
 
 @http.route('/get_match', methods=['GET'])
