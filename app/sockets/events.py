@@ -35,7 +35,7 @@ def match_event(form):
     data = {}
     if(form['action'] == "user_ready"):
         data = events_tools.user_ready(form)
-    if(form['action'] == "user_selected_character")
+    if(form['action'] == "user_selected_character"):
         data = events_tools.add_character_selection()
     emit('match_response',
     {'action': form['action'],
