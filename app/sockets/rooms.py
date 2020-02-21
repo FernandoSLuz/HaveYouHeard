@@ -10,13 +10,13 @@ def join(form):
         form = json.loads(form)
     join_room(form['match_data']['id'])
     session['receive_count'] = session.get('receive_count', 0) + 1
-    events_tools.user_joined(form)
-    data = events_tools.get_match_info(form['match_data']['id'])
+    data = events_tools.user_joined(form)
     emit('match_response',
          {'action': 'join_match',
           'count': session['receive_count'],
           'data': data
-    })
+    },
+    room=form['match_data']['id'])
 
 @socketio.on('leave')
 def leave(form):
@@ -27,8 +27,8 @@ def leave(form):
     emit('match_response',
          {'action': 'user_left ' + ', '.join(rooms()),
           'count': session['receive_count'],
-          'data': form['user_data']
-    })
+          'data': form['user_data']},
+          room = form['match_data']['id'])
 
 @socketio.on('close_room')
 def close(form):

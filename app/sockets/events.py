@@ -32,9 +32,13 @@ def match_event(form):
     if(isinstance(form, str)):
         form = json.loads(form, encoding='utf-8')
     session['receive_count'] = session.get('receive_count', 0) + 1
-    print(form)
+    data = {}
+    if(form['action'] == "user_ready"):
+        data = events_tools.user_ready(form)
+    if(form['action'] == "user_selected_character")
+        data = events_tools.add_character_selection()
     emit('match_response',
     {'action': form['action'],
     'count': session['receive_count'],
-    'data': form['data']},
-    room=form['match_data']['id'])
+    'data': data},
+    room=form['data']['match_data']['id'])

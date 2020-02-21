@@ -40,8 +40,8 @@ def create_match(form):
 
 def join_match(form):
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    command = "INSERT INTO match_users (id_user, id_match, is_player, won, created_at) VALUES(%s, %s, %s, %s, %s) RETURNING id, id_user, id_match, is_player, won, created_at;"
-    data = (form['user_data']['id'], form['match_data']['id'], form['is_player'], False, dt.datetime.now(),)
+    command = "INSERT INTO match_users (id_user, id_match, is_player, won, created_at, ready, color) VALUES(%s, %s, %s, %s, %s, %s, %s) RETURNING id, id_user, id_match, is_player, won, created_at, ready, color;"
+    data = (form['user_data']['id'], form['match_data']['id'], form['is_player'], False, dt.datetime.now(), False, "-",)
     return query(cur, command, data, False)
 
 def get_match(form):
