@@ -50,3 +50,20 @@ def get_match(form):
     data = (form['id'],)
     return query(cur, command, data, False)
 
+def add_character(form):
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "INSERT INTO characters (name, description, country, created_at) VALUES(%s, %s, %s, %s) RETURNING id,name,description,country,created_at;"
+    data = (form['name'], form['description'], form['country'], dt.datetime.now(),)
+    return query(cur, command, data, False)
+
+def add_topic(form):
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "INSERT INTO topics (name, created_at) VALUES(%s, %s) RETURNING id,name,created_at;"
+    data = (form['name'], dt.datetime.now(),)
+    return query(cur, command, data, False)
+
+def add_news(form):
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "INSERT INTO news (complete_text, incomplete_text, id_topic, url, created_at) VALUES(%s, %s, %s, %s, %s) RETURNING id,complete_text,incomplete_text,id_topic, url,created_at;"
+    data = (form['complete_text'],form['incomplete_text'],form['id_topic'],form['url'], dt.datetime.now(),)
+    return query(cur, command, data, False)

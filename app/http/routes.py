@@ -94,3 +94,48 @@ def get_match():
         callbackDict = verification[1]
         status_code = verification[0]
     return json.dumps(callbackDict, indent=2, default=str), status_code
+
+@http.route('/add_character', methods=['POST'])
+def add_character():
+    form = request.get_json(silent=True, force=True)
+    status_code = 0
+    callbackDict = {}
+    if(routes_tools.check_json(form, ['name', 'description', 'country']) == False):
+        status_code = 406
+        callbackDict = {'feedback': 'missing POST body data'}
+    else:
+        callbackDict = db.querys.add_character(form)
+        verification = routes_tools.check_db_callback(callbackDict, 'character created', 'character not created')
+        callbackDict = verification[1]
+        status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str), status_code
+
+@http.route('/add_topic', methods=['POST'])
+def add_topic():
+    form = request.get_json(silent=True, force=True)
+    status_code = 0
+    callbackDict = {}
+    if(routes_tools.check_json(form, ['name']) == False):
+        status_code = 406
+        callbackDict = {'feedback': 'missing POST body data'}
+    else:
+        callbackDict = db.querys.add_topic(form)
+        verification = routes_tools.check_db_callback(callbackDict, 'topic created', 'topic not created')
+        callbackDict = verification[1]
+        status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str), status_code
+
+@http.route('/add_news', methods=['POST'])
+def add_news():
+    form = request.get_json(silent=True, force=True)
+    status_code = 0
+    callbackDict = {}
+    if(routes_tools.check_json(form, ['complete_text','incomplete_text','id_topic', 'url']) == False):
+        status_code = 406
+        callbackDict = {'feedback': 'missing POST body data'}
+    else:
+        callbackDict = db.querys.add_news(form)
+        verification = routes_tools.check_db_callback(callbackDict, 'mews created', 'news not created')
+        callbackDict = verification[1]
+        status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str), status_code
