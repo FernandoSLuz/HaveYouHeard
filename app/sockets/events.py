@@ -10,6 +10,10 @@ def user_event(form):
         form = json.loads(form)
     print('sending message')
     session['receive_count'] = session.get('receive_count', 0) + 1
+    if(form['action'] == "check_match_status"):
+        form['data'] = events_tools.get_match_status(form)
+    if(form['action'] == "send_character_selection"):
+        form['data'] = events_tools.send_character_selection(form)
     emit('user_response',
     {'action': form['action'],
     'count': session['receive_count'],

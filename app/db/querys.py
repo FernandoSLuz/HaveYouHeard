@@ -70,18 +70,18 @@ def add_news(form):
 
 def get_news():
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    command = "SELECT * FROM news"
+    command = "SELECT id,complete_text,incomplete_text,url,id_topic FROM news"
     data = None
     return query(cur, command, data, True)
 
 def get_topics():
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    command = "SELECT * FROM topics"
+    command = "SELECT id,name FROM topics"
     data = None
     return query(cur, command, data, True)
 
 def get_characters(form):
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    command = "SELECT * FROM characters WHERE country  = %s;"
+    command = "SELECT id,name,description,country FROM characters WHERE country  = %s;"
     data = (form['country'],)
     return query(cur, command, data, True)
