@@ -66,4 +66,22 @@ def add_news(form):
     cur = conn.cursor(cursor_factory=RealDictCursor)
     command = "INSERT INTO news (complete_text, incomplete_text, id_topic, url, created_at) VALUES(%s, %s, %s, %s, %s) RETURNING id,complete_text,incomplete_text,id_topic, url,created_at;"
     data = (form['complete_text'],form['incomplete_text'],form['id_topic'],form['url'], dt.datetime.now(),)
-    return query(cur, command, data, False)
+    return query(cur, command, data, True)
+
+def get_news():
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "SELECT * FROM news"
+    data = None
+    return query(cur, command, data, True)
+
+def get_topics():
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "SELECT * FROM topics"
+    data = None
+    return query(cur, command, data, True)
+
+def get_characters(form):
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    command = "SELECT * FROM characters WHERE country  = %s;"
+    data = (form['country'],)
+    return query(cur, command, data, True)

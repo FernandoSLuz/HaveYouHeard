@@ -29,7 +29,7 @@ def get_user():
         verification = routes_tools.check_db_callback(callbackDict, 'user found', 'user not found')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/add_user', methods=['POST'])
 def add_user():
@@ -44,7 +44,7 @@ def add_user():
         verification = routes_tools.check_db_callback(callbackDict, 'user created', 'user not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/get_language', methods=['GET'])
 def get_language():
@@ -63,7 +63,7 @@ def join_match():
         verification = routes_tools.check_db_callback(callbackDict, 'match joined', 'match not joined')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/create_match', methods=['POST'])
 def create_match():
@@ -78,7 +78,7 @@ def create_match():
         verification = routes_tools.check_db_callback(callbackDict, 'match created', 'match not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/get_match', methods=['GET'])
 def get_match():
@@ -93,7 +93,7 @@ def get_match():
         verification = routes_tools.check_db_callback(callbackDict, 'match found', 'match not found')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/add_character', methods=['POST'])
 def add_character():
@@ -108,7 +108,7 @@ def add_character():
         verification = routes_tools.check_db_callback(callbackDict, 'character created', 'character not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/add_topic', methods=['POST'])
 def add_topic():
@@ -123,7 +123,7 @@ def add_topic():
         verification = routes_tools.check_db_callback(callbackDict, 'topic created', 'topic not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
 @http.route('/add_news', methods=['POST'])
 def add_news():
@@ -138,4 +138,39 @@ def add_news():
         verification = routes_tools.check_db_callback(callbackDict, 'mews created', 'news not created')
         callbackDict = verification[1]
         status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str), status_code
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
+
+@http.route('/get_news', methods=['GET'])
+def get_news():
+    status_code = 0
+    callbackDict = {}
+    callbackDict = db.querys.get_news()
+    verification = routes_tools.check_db_callback(callbackDict, 'obtained news', 'news not obtained')
+    callbackDict = verification[1]
+    status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
+
+@http.route('/get_topics', methods=['GET'])
+def get_topics():
+    status_code = 0
+    callbackDict = {}
+    callbackDict = db.querys.get_topics()
+    verification = routes_tools.check_db_callback(callbackDict, 'obtained topics', 'topics not obtained')
+    callbackDict = verification[1]
+    status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
+
+@http.route('/get_characters', methods=['GET'])
+def get_characters():
+    form = request.get_json(silent=True, force=True)
+    status_code = 0
+    callbackDict = {}
+    if(routes_tools.check_json(form, ['country']) == False):
+        status_code = 406
+        callbackDict = {'feedback': 'missing POST body data'}
+    else:
+        callbackDict = db.querys.get_characters(form)
+        verification = routes_tools.check_db_callback(callbackDict, 'characters found', 'characters not found')
+        callbackDict = verification[1]
+        status_code = verification[0]
+    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
