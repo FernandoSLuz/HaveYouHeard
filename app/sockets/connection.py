@@ -14,7 +14,7 @@ def background_thread():
         socketio.sleep(10)
         count += 1
         socketio.emit('user_response',
-                      {'data': 'Server generated event', 'count': count})
+                      {'data': 'Server generated event', 'count': count, 'action': 'background_thread'})
 
 @socketio.on('disconnect_request')
 def disconnect_request():

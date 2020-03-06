@@ -8,12 +8,12 @@ from . import events_tools
 def user_event(form):
     if(isinstance(form, str)):
         form = json.loads(form)
-    print('sending message')
     session['receive_count'] = session.get('receive_count', 0) + 1
     if(form['action'] == "check_match_status"):
         form['data'] = events_tools.get_match_status(form)
     if(form['action'] == "send_character_selection"):
-        form['data'] = events_tools.send_character_selection(form)
+        events_tools.process_character_selection(form)
+        return
     emit('user_response',
     {'action': form['action'],
     'count': session['receive_count'],
@@ -41,6 +41,8 @@ def match_event(form):
         data = events_tools.user_ready(form)
     if(form['action'] == "user_selected_character"):
         data = events_tools.add_character_selection(form)
+    if(form['action'] == "characters_voted"):
+        data = form['data']
     emit('match_response',
     {'action': form['action'],
     'count': session['receive_count'],

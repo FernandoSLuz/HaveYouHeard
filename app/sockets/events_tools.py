@@ -2,6 +2,8 @@ import json
 from .. import db
 import random
 import asyncio
+from . import events
+
 general_matches = []
 
 colors = ["EB5757","F2994A","F2C94C","219653","65C3C9","2F80ED"]
@@ -41,7 +43,7 @@ def set_colors(match_id):
                         break
                 if(has_color == False):
                     for match_user in general_match["match_users_data"]:
-                        print("user color = " + match_user['color'])
+                        #print("user color = " + match_user['color'])
                         if(match_user['color'] == "-"):       
                             match_user['color'] = color
             return general_match
@@ -80,12 +82,56 @@ def get_match_status(form):
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
             return {'status': general_match['match_data']['status']}
 
-def send_character_selection(form):
+def process_character_selection(form):
     for general_match in general_matches:
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
-            general_match['selected_characters_data'].append(form['data']['character_data'])
-            print(general_match['selected_characters_data'])
-            return general_match['selected_characters_data']
+            has_key = False
+            for selected_character_data in general_match['selected_characters_data']:
+                if(selected_character_data['id'] == form['data']['character_data']['id']):
+                    has_key = True
+                    selected_character_data['votes'] = selected_character_data['votes'] + 1
+                    break
+            if(has_key == False):
+                form['data']['character_data']['votes'] = 1
+                general_match['selected_characters_data'].append(form['data']['character_data'])
+            check_characters_count(general_match['match_data']['id'])
+
+def check_characters_count(match_id):
+    total_votes = 0
+    total_users = 0
+    final_character = {}
+    for general_match in general_matches:
+        if(general_match['match_data']['id'] == match_id):
+            total_users = len(general_match['match_users_data'])
+            for selected_character_data in general_match['selected_characters_data']:
+                total_votes = total_votes + selected_character_data['votes']
+                if(final_character == {}):
+                    final_character = selected_character_data
+                else:
+                    if(selected_character_data['votes'] == final_character['votes']):
+                        random_character_selection = []
+                        random_character_selection.append(final_character)
+                        random_character_selection.append(selected_character_data)
+                        print("random_character_selection LENGHT" + str(len(random_character_selection)))
+                        random_value = random.randint(0,1)
+                        print(random_value)
+                        final_character = random_character_selection[random_value]
+                    elif(selected_character_data['votes'] > final_character['votes']):
+                        final_character = selected_character_data['votes']
+            if(total_users == total_votes):
+                del general_match['selected_characters_data']
+                del general_match['characters_data']
+                general_match['character_data'] = final_character
+                data = {}
+                data['character_data'] = general_match['character_data']
+                data['match_data'] = general_match['match_data']
+                form = {
+                    'data': data,
+                    'action': 'characters_voted'
+                }
+                events.match_event(form)
+                return
+
 
 def user_ready(form):
     data = {}
@@ -110,7 +156,7 @@ def user_ready(form):
     return data
             
 def add_character_selection(form):
-    print("character selected")
+    #print("character selected")
     data = {} 
     return data        
 
