@@ -11,8 +11,14 @@ def user_event(form):
     session['receive_count'] = session.get('receive_count', 0) + 1
     if(form['action'] == "check_match_status"):
         form['data'] = events_tools.get_match_status(form)
-    if(form['action'] == "send_character_selection"):
+    elif(form['action'] == "send_character_selection"):
         events_tools.process_character_selection(form)
+        return
+    elif(form['action'] == "news_fulfilled"):
+        events_tools.process_news_fulfillment(form)
+        return
+    elif(form['action'] == "send_vote"):
+        events_tools.process_vote_selection(form)
         return
     emit('user_response',
     {'action': form['action'],
@@ -39,10 +45,14 @@ def match_event(form):
     data = {}
     if(form['action'] == "user_ready"):
         data = events_tools.user_ready(form)
-    if(form['action'] == "user_selected_character"):
+    elif(form['action'] == "user_selected_character"):
         data = events_tools.add_character_selection(form)
-    if(form['action'] == "characters_voted"):
+    elif(form['action'] == "characters_voted"):
         data = form['data']
+    elif(form['action'] == "news_fulfilled"):
+        data = form['data']
+    elif(form['action'] == "news_voting_finished"):
+        data = form['data']  
     emit('match_response',
     {'action': form['action'],
     'count': session['receive_count'],

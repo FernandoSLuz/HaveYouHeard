@@ -21,6 +21,7 @@ def populate_rounds():
         temp_new = temp_news[round_actual_loop]
         temp_new['on_going'] = True
         temp_new['round'] = round_actual_loop
+        temp_new['fulfillments'] = []
         news.append(temp_new)
         round_actual_loop = round_actual_loop + 1
     return news
@@ -82,6 +83,69 @@ def get_match_status(form):
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
             return {'status': general_match['match_data']['status']}
 
+def process_news_fulfillment(form):
+    for general_match in general_matches:
+        if(general_match['match_data']['id'] == form['data']['match_data']['id']):
+            for round_data in general_match['rounds_data']:
+                if(round_data['on_going'] == True):
+                    round_data['fulfillments'].append(form['data']['fulfillment_data'])
+                    if(len(general_match['match_users_data']) == len(round_data['fulfillments'])):
+                        round_data['on_going'] = False
+                        data = {}
+                        data['fulfillments'] = round_data['fulfillments']
+                        data['match_data'] = general_match['match_data']
+                        new_form = {
+                            'data': data,
+                            'action': 'news_fulfilled'
+                        }
+                        events.match_event(new_form)
+                    return 
+
+def process_vote_selection(form):
+    for general_match in general_matches:
+        if(general_match['match_data']['id'] == form['data']['match_data']['id']):
+            for round_data in general_match['rounds_data']:
+                if(round_data['round'] == form['data']['vote_data']['round']):
+                    if(form['data']['vote_data']['id_user'] == -1):
+                        check_votes_count(form['data']['match_data']['id'], form['data']['vote_data']['round'], 1)
+                    else:
+                        for fulfillment in round_data['fulfillments']:
+                            if(fulfillment['id_user'] == form['data']['vote_data']['id_user']):
+                                fulfillment['votes'] = fulfillment['votes'] + 1
+                                check_votes_count(form['data']['match_data']['id'], form['data']['vote_data']['round'], 0)
+                                return
+
+def check_votes_count(match_id, round, null_votes):
+    total_votes = null_votes
+    total_users = 0
+    round_winner = {}
+    for general_match in general_matches:
+        if(general_match['match_data']['id'] == match_id):
+            total_users = len(general_match['match_users_data'])
+            for round_data in general_match['rounds_data']:
+                if(round_data['round'] == round):
+                    for fulfillment in round_data['fulfillments']:
+                        total_votes = total_votes + fulfillment['votes']
+                        if(round_winner == {} and fulfillment['votes'] != 0):
+                            round_winner = fulfillment
+                        else:
+                            if(round_winner != {}):
+                                if(round_winner['votes'] < fulfillment['votes']):
+                                    round_winner = fulfillment
+                    round_data['round_winner'] = round_winner
+                    if(total_votes == total_users):
+                        data = {}
+                        data['round_winner'] = round_data['round_winner']
+                        data['match_data'] = general_match['match_data']
+                        form = {
+                            'data': data,
+                            'action': 'news_voting_finished'
+                        }
+                        events.match_event(form)
+                    return
+
+
+
 def process_character_selection(form):
     for general_match in general_matches:
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
@@ -112,12 +176,10 @@ def check_characters_count(match_id):
                         random_character_selection = []
                         random_character_selection.append(final_character)
                         random_character_selection.append(selected_character_data)
-                        print("random_character_selection LENGHT" + str(len(random_character_selection)))
                         random_value = random.randint(0,1)
-                        print(random_value)
                         final_character = random_character_selection[random_value]
                     elif(selected_character_data['votes'] > final_character['votes']):
-                        final_character = selected_character_data['votes']
+                        final_character = selected_character_data
             if(total_users == total_votes):
                 del general_match['selected_characters_data']
                 del general_match['characters_data']
