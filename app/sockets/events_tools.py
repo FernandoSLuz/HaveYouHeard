@@ -144,24 +144,26 @@ def check_votes_count(match_id, round, null_votes):
                         events.match_event(form)
                     return
 
-
-
 def process_character_selection(form):
     for general_match in general_matches:
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
+            null_votes = 0;
             has_key = False
-            for selected_character_data in general_match['selected_characters_data']:
-                if(selected_character_data['id'] == form['data']['character_data']['id']):
-                    has_key = True
-                    selected_character_data['votes'] = selected_character_data['votes'] + 1
-                    break
-            if(has_key == False):
-                form['data']['character_data']['votes'] = 1
-                general_match['selected_characters_data'].append(form['data']['character_data'])
-            check_characters_count(general_match['match_data']['id'])
+            if(form['data']['character_data']['id'] == -1):
+                null_votes = 1;
+            else:
+                for selected_character_data in general_match['selected_characters_data']:
+                    if(selected_character_data['id'] == form['data']['character_data']['id']):
+                        has_key = True
+                        selected_character_data['votes'] = selected_character_data['votes'] + 1
+                        break
+                if(has_key == False):
+                    form['data']['character_data']['votes'] = 1
+                    general_match['selected_characters_data'].append(form['data']['character_data'])
+            check_characters_count(general_match['match_data']['id'], null_votes)
 
-def check_characters_count(match_id):
-    total_votes = 0
+def check_characters_count(match_id, null_votes):
+    total_votes = null_votes
     total_users = 0
     final_character = {}
     for general_match in general_matches:
