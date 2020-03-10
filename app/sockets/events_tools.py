@@ -147,10 +147,12 @@ def check_votes_count(match_id, round, null_votes):
 def process_character_selection(form):
     for general_match in general_matches:
         if(general_match['match_data']['id'] == form['data']['match_data']['id']):
-            null_votes = 0;
+            if(('null_votes' in general_match) == False):
+                general_match['null_votes'] = 0
+            null_votes = 0
             has_key = False
             if(form['data']['character_data']['id'] == -1):
-                null_votes = 1;
+                general_match['null_votes'] = general_match['null_votes'] + 1
             else:
                 for selected_character_data in general_match['selected_characters_data']:
                     if(selected_character_data['id'] == form['data']['character_data']['id']):
@@ -160,31 +162,37 @@ def process_character_selection(form):
                 if(has_key == False):
                     form['data']['character_data']['votes'] = 1
                     general_match['selected_characters_data'].append(form['data']['character_data'])
-            check_characters_count(general_match['match_data']['id'], null_votes)
+            check_characters_count(general_match['match_data']['id'])
 
-def check_characters_count(match_id, null_votes):
-    total_votes = null_votes
+def check_characters_count(match_id):
+    total_votes = 0
     total_users = 0
     final_character = {}
     for general_match in general_matches:
         if(general_match['match_data']['id'] == match_id):
+            total_votes = general_match['null_votes']
             total_users = len(general_match['match_users_data'])
-            for selected_character_data in general_match['selected_characters_data']:
-                total_votes = total_votes + selected_character_data['votes']
-                if(final_character == {}):
-                    final_character = selected_character_data
-                else:
-                    if(selected_character_data['votes'] == final_character['votes']):
-                        random_character_selection = []
-                        random_character_selection.append(final_character)
-                        random_character_selection.append(selected_character_data)
-                        random_value = random.randint(0,1)
-                        final_character = random_character_selection[random_value]
-                    elif(selected_character_data['votes'] > final_character['votes']):
+            if(len(general_match['selected_characters_data']) == 0):
+                print("empty_list")
+                final_character = general_match['characters_data'][random.randint(0, len(general_match['characters_data'])-1)]
+            else:
+                for selected_character_data in general_match['selected_characters_data']:
+                    total_votes = total_votes + selected_character_data['votes']
+                    if(final_character == {}):
                         final_character = selected_character_data
+                    else:
+                        if(selected_character_data['votes'] == final_character['votes']):
+                            random_character_selection = []
+                            random_character_selection.append(final_character)
+                            random_character_selection.append(selected_character_data)
+                            random_value = random.randint(0,1)
+                            final_character = random_character_selection[random_value]
+                        elif(selected_character_data['votes'] > final_character['votes']):
+                            final_character = selected_character_data
             if(total_users == total_votes):
                 del general_match['selected_characters_data']
                 del general_match['characters_data']
+                del general_match['null_votes']
                 general_match['character_data'] = final_character
                 data = {}
                 data['character_data'] = general_match['character_data']
