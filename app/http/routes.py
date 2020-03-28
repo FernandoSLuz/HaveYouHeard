@@ -6,6 +6,7 @@ from .. import db
 import json
 from . import routes_tools
 from .. import sockets
+from flask import jsonify
 #async_mode = None
 
 @http.route('/')
@@ -158,7 +159,10 @@ def get_topics():
     verification = routes_tools.check_db_callback(callbackDict, 'obtained topics', 'topics not obtained')
     callbackDict = verification[1]
     status_code = verification[0]
-    return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
+    json_response = jsonify(callbackDict)
+    json_response.headers.add('Access-Control-Allow-Origin', '*')
+    #json_response = json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False)
+    return json_response, status_code
 
 @http.route('/get_characters', methods=['GET'])
 def get_characters():
