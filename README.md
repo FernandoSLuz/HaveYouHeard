@@ -8,4 +8,4 @@ Refer to the [top-level README](../README.md) for instructions on running and de
 
 To run locally, you need to use gunicorn with the ``flask_socket`` worker:
 
-    $ gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
+    $ gunicorn --worker-class eventlet -w 1 server:app
