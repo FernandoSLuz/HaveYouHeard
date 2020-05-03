@@ -37,6 +37,8 @@ def disconnect_request():
 def ping_pong():
     emit('my_pong')
 
+
+
 @socketio.on('connect')
 def test_connect():
 

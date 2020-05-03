@@ -18,6 +18,19 @@ def join(form):
     },
     room=form['match_data']['id'])
 
+@socketio.on('rejoin')
+def join(form):
+    if(isinstance(form, str)):
+        form = json.loads(form)
+    join_room(form['match_data']['id'])
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('match_response',
+         {'action': 'rejoin_match',
+          'count': session['receive_count'],
+          'data': form
+    },
+    room=form['match_data']['id'])
+
 @socketio.on('leave')
 def leave(form):
     if(isinstance(form, str)):
